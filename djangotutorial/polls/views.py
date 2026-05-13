@@ -11,10 +11,13 @@ navegador -> URL -> urls.py -> views.index() -> HttpResponse """
 """ INDEX ANTIGUO
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.") """
+
 def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5] #busca pregutas en la tabla polls_question, las ordena descedetemente y se queda solo con las 5 primeras
-    output = ", ".join([q.question_text for q in latest_question_list]) #covierte las preguntas en texto separado por comas
-    return HttpResponse(output)
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]#busca pregutas en la tabla polls_question, las ordena descedetemente y se queda solo con las 5 primeras
+    template = loader.get_template("polls/index.html")
+    context = {"latest_question_list": latest_question_list}
+    return HttpResponse(template.render(context, request))
+
 
 
 
