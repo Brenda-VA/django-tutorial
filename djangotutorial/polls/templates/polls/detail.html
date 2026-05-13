@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- muestra el atributo question_text del objeto question -->
+    <h1>{{ question.question_text }}</h1>
+
+    <ul>
+      <!-- recorre todas las opciones relacionadas con esta pregunta 
+Aunque parece que falta (), Django lo interpreta como: 'question.choice_set.all()'
+ademas choice_set existe automáticamente porque en mi modelo tengo: question = models.ForeignKey(Question, on_delete=models.CASCADE) -->
+      {% for choice in question.choice_set.all %}
+      <li>{{ choice.choice_text }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

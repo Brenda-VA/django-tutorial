@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
 from .models import Question
 # Una vista en Django es una función que recibe una petición HTTP y devuelve una respuesta HTTP.
 """ En este caso:
@@ -37,7 +38,13 @@ views.detail(request, question_id=34)
   ↓
 HttpResponse(...).     """
 def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
+    try:
+        question = Question.objects.get(pk=question_id)#busca una Questionn cuyo id(primary key) sea question_id
+    except Question.DoesNotExist:#si no la encuentra, devuelve error 404
+        raise Http404("Question does not exist")
+    #si existe, la guarda e question
+    return render(request, "polls/detail.html", {"question": question})
+
 
 
 """  Vista de resultados de una pregunta concreta
