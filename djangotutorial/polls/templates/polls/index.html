@@ -10,7 +10,10 @@
     <ul>
       {% for question in latest_question_list %}
       <li>
-        <a href="/polls/{{ question.id }}/">{{ question.question_text }}</a>
+        <!-- busca una ruta llamada detail dentro de la app polls y le pasa el question.id como parametro -->
+        <a href="{% url 'polls:detail' question.id %}"
+          >{{ question.question_text }}</a
+        >
       </li>
       {% endfor %}
     </ul>
