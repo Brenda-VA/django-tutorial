@@ -1,18 +1,15 @@
 from django.db.models import F
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views import generic
 from .models import Choice, Question
 # Una vista en Django es una función que recibe una petición HTTP y devuelve una respuesta HTTP.
 """ En este caso:
  - (request) representa la petición que llega desde el navegador.
  - HttpResponse() devuelve texto plano al navegador.
-
  Flujo:
 navegador -> URL -> urls.py -> views.index() -> HttpResponse """
-""" INDEX ANTIGUO
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.") """
 
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
