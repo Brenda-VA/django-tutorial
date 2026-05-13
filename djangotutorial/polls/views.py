@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.template import loader
+from django.shortcuts import render
 from .models import Question
 # Una vista en Django es una función que recibe una petición HTTP y devuelve una respuesta HTTP.
 """ En este caso:
@@ -13,12 +13,11 @@ def index(request):
     return HttpResponse("Hello, world. You're at the polls index.") """
 
 def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]#busca pregutas en la tabla polls_question, las ordena descedetemente y se queda solo con las 5 primeras
-    template = loader.get_template("polls/index.html")
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
     context = {"latest_question_list": latest_question_list}
-    return HttpResponse(template.render(context, request))
-
-
+    ''' la funcion render es un atajo, toma el objeto request, busca la ruta, le pasa el diccionario context 
+    y me devuelve un objeto httpResponse ya procesado'''
+    return render(request, "polls/index.html", context)
 
 
 """  Vista de detalle de una pregunta concreta, ahora tenemos varias preguntas: 
