@@ -1,7 +1,8 @@
-from django.http import HttpResponse
-from django.http import Http404
+from django.db.models import F
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from .models import Question
+from django.urls import reverse
+from .models import Choice, Question
 # Una vista en Django es una función que recibe una petición HTTP y devuelve una respuesta HTTP.
 """ En este caso:
  - (request) representa la petición que llega desde el navegador.
@@ -38,23 +39,56 @@ views.detail(request, question_id=34)
   ↓
 HttpResponse(...).     """
 def detail(request, question_id):
-    try:
-        question = Question.objects.get(pk=question_id)#busca una Questionn cuyo id(primary key) sea question_id
-    except Question.DoesNotExist:#si no la encuentra, devuelve error 404
-        raise Http404("Question does not exist")
-    #si existe, la guarda e question
+    '''busca en la tabla Questionn una pregunta cuyo id sea igual al numero recibido por la url. Ejm:
+URL: /polls/1/ -> polls/urls.py captura question_id = 1
+get_object_or_404 hace dos cosas:  1. Si encuentra la pregunta, la guarda en la variable question.
+                                   2. Si no la encuentra, Django devuelve automáticamente una página 404.    '''
+    question = get_object_or_404(Question, pk=question_id)
+    '''renderiza el template deteail.html y le pasa la pregunta encontrada
+    Ademas, en detail.html podemos usar {{ question.question_text }}'''
     return render(request, "polls/detail.html", {"question": question})
-
-
 
 """  Vista de resultados de una pregunta concreta
  Ejemplo: /polls/34/results/ """
 def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
+    # Busca la pregunta votada.
+    question = get_object_or_404(Question, pk=question_id)
+    # Renderiza la página de resultados.
+    return render(request, "polls/results.html", {"question": question})
 
 
 """  Vista para votar en una pregunta concreta
  Ejemplo: /polls/34/vote/ """
 def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+    # Busca la pregunta por id.
+    # Si no existe, devuelve 404.
+    question = get_object_or_404(Question, pk=question_id)
+
+    try:
+        # request.POST contiene los datos enviados por el formulario.
+        # En detail.html todos los radios tienen: name="choice"
+        # Por eso aquí podemos leer: request.POST["choice"]
+        # Ese valor será el id de la opción seleccionada.
+        selected_choice = question.choice_set.get(pk=request.POST["choice"])
+    except (KeyError, Choice.DoesNotExist):
+        # Si no se seleccionó ninguna opción, request.POST["choice"] no existe, lo que provoca KeyError.
+        # Si el id enviado no corresponde a una Choice válida, eso provoca Choice.DoesNotExist.
+        #vEn ambos casos, volvemos a mostrar el formulario con un mensaje de error.
+        return render(
+            request,
+            "polls/detail.html",
+            {
+                "question": question,
+                "error_message": "You didn't select a choice.",
+            },
+        )
+    else:
+        # F("votes") + 1 significa: "haz la suma directamente en la base de datos".
+        selected_choice.votes = F("votes") + 1 # Suma 1 voto a la opción seleccionada.
+        selected_choice.save()
+
+        # Después de procesar correctamente un POST, nos redirigimos a otra URL.
+        # Esto evita que el voto se repita si el usuario refresca la página.
+        return HttpResponseRedirect(
+            reverse("polls:results", args=(question.id,))
+        )
