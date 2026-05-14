@@ -6,7 +6,7 @@ Antes Django mostraba los campos en el orden del modelo:    - question_text
                                                             - pub_date 
 Y ahora forzamos a que aparzca primero pub_date y luego question_text                                                            '''
 
-class ChoiceInline(admin.StackedInline):
+class ChoiceInline(admin.TabularInline):
     model = Choice #indica que choice se editara dentro de question
     extra = 3 # Django mostrará 3 formularios vacios extra para añadir opciones
 
