@@ -38,8 +38,10 @@ INSTALLED_APPS = [# ------- aqui se meten las apps que vayamos a usar, si no lo 
     'django.contrib.sessions',# framework de sesion
     'django.contrib.messages',#framework de mensajeria
     'django.contrib.staticfiles',#framework para manejar archivos estáticos
+    "debug_toolbar",
 ]
 
+#esto es codigo que se ejecuta en todas las requests/responses
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -116,3 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
