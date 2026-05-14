@@ -47,6 +47,9 @@ HttpResponse(...).     """
 class DetailView(generic.DetailView):#muestra un objeto concreto
     model = Question
     template_name = "polls/detail.html"
+    def get_queryset(self):
+        """ Excluye preguntas que todavía no han sido publicadas. """
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 """  Vista de resultados de una pregunta concreta
  Ejemplo: /polls/34/results/ """

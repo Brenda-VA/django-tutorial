@@ -8,6 +8,8 @@ from django.urls import reverse
 Ran 3 tests in 0.001s
 OK
 Destroying test database for alias 'default'... """
+
+
 class QuestionModelTests(TestCase):
     def test_was_published_recently_with_future_question(self):
         """  was_published_recently() returns False for questions whose pub_date is in the future 
@@ -35,6 +37,9 @@ def create_question(question_text, days):
     time = timezone.now() + datetime.timedelta(days=days)
     return Question.objects.create(question_text=question_text, pub_date=time)
 
+
+
+
 class QuestionIndexViewTests(TestCase):
     def test_no_questions(self): #revisa el mensaje «No polls are available.» y verifica que latest_question_list este vacia
         """ Si no hay preguntas, se muestra un mensaje adecuado """
@@ -47,7 +52,6 @@ class QuestionIndexViewTests(TestCase):
         """ Las preguntas publicadas en el pasado aparecen en el index. """
         question = create_question(question_text="Past question.", days=-30)
         response = self.client.get(reverse("polls:index"))
-
         self.assertQuerySetEqual(
             response.context["latest_question_list"],
             [question],
@@ -57,7 +61,6 @@ class QuestionIndexViewTests(TestCase):
         """ Las preguntas futuras no aparecen en el index. """
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse("polls:index"))
-
         self.assertContains(response, "No polls are available.")
         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
@@ -66,7 +69,6 @@ class QuestionIndexViewTests(TestCase):
         question = create_question(question_text="Past question.", days=-30)
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse("polls:index"))
-
         self.assertQuerySetEqual(
             response.context["latest_question_list"],
             [question],
@@ -82,3 +84,18 @@ class QuestionIndexViewTests(TestCase):
             response.context["latest_question_list"],
             [question2, question1],
         )
+
+class QuestionDetailViewTests(TestCase):
+    def test_future_question(self):
+        """ El detalle de una pregunta futura devuelve 404. """
+        future_question = create_question(question_text="Future question.", days=5)
+        url = reverse("polls:detail", args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        """ El detalle de una pregunta pasada muestra el texto de la pregunta.  """
+        past_question = create_question(question_text="Past Question.", days=-5)
+        url = reverse("polls:detail", args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, past_question.question_text)        
