@@ -11,13 +11,19 @@ from .models import Choice, Question
  Flujo:
 navegador -> URL -> urls.py -> views.index() -> HttpResponse """
 
-def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    context = {"latest_question_list": latest_question_list}
-    ''' la funcion render es un atajo, toma el objeto request, busca la ruta, le pasa el diccionario context 
-    y me devuelve un objeto httpResponse ya procesado'''
-    return render(request, "polls/index.html", context)
+'''AHORA USAMOS VISTAS GENERICAS 'IndexView', 'DetailView' Y 'ResultsView' 
+Antes escribiamos manualmente lo de buscar datos, crear el context y renderizar el template
 
+
+template_name = Le dice a Django que use unn nombre de plantilla especifico en vez del nombre de plantilla generado de forma automática
+Esto hace q la vista de resultados y detalle tengan un aspecto diferente cuando sean creadas, a pesar de que ambas tengan una vista generica DetailView en 2do plano   '''
+
+class IndexView(generic.ListView):# muestra una lista de objetos
+    template_name = "polls/index.html"
+    context_object_name = "latest_question_list"
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by("-pub_date")[:5]
 
 """  Vista de detalle de una pregunta concreta, ahora tenemos varias preguntas: 
                 - /polls/
@@ -35,23 +41,15 @@ polls/urls.py
 views.detail(request, question_id=34)
   ↓
 HttpResponse(...).     """
-def detail(request, question_id):
-    '''busca en la tabla Questionn una pregunta cuyo id sea igual al numero recibido por la url. Ejm:
-URL: /polls/1/ -> polls/urls.py captura question_id = 1
-get_object_or_404 hace dos cosas:  1. Si encuentra la pregunta, la guarda en la variable question.
-                                   2. Si no la encuentra, Django devuelve automáticamente una página 404.    '''
-    question = get_object_or_404(Question, pk=question_id)
-    '''renderiza el template deteail.html y le pasa la pregunta encontrada
-    Ademas, en detail.html podemos usar {{ question.question_text }}'''
-    return render(request, "polls/detail.html", {"question": question})
+class DetailView(generic.DetailView):#muestra un objeto concreto
+    model = Question
+    template_name = "polls/detail.html"
 
 """  Vista de resultados de una pregunta concreta
  Ejemplo: /polls/34/results/ """
-def results(request, question_id):
-    # Busca la pregunta votada.
-    question = get_object_or_404(Question, pk=question_id)
-    # Renderiza la página de resultados.
-    return render(request, "polls/results.html", {"question": question})
+class ResultsView(generic.DetailView):#muestra un objeto concreto pero usando otro template
+    model = Question
+    template_name = "polls/results.html"
 
 
 """  Vista para votar en una pregunta concreta
