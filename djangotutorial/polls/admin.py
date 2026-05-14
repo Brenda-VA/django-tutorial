@@ -20,6 +20,9 @@ class QuestionAdmin(admin.ModelAdmin):
     ]
     # conectamos las opciones Choice con el formulario de Questions
     inlines = [ChoiceInline]
+    list_display = ["question_text", "pub_date", "was_published_recently"]# Columnas visibles en la lista de Questions
+    list_filter = ["pub_date"]# filtros laterales por fecha
+    search_fields = ["question_text"]# caja de búsqueda por texto de pregunta
 
 #registramos el modelo Question en admin pero usando la configuracion personalizada QuestionAdmin
 admin.site.register(Question, QuestionAdmin)#con esto podremos crear preguntas, editarlas y borrarlas
