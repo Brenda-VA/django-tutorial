@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from .models import Choice, Question
+from django.utils import timezone
 # Una vista en Django es una función que recibe una petición HTTP y devuelve una respuesta HTTP.
 """ En este caso:
  - (request) representa la petición que llega desde el navegador.
@@ -18,12 +19,14 @@ Antes escribiamos manualmente lo de buscar datos, crear el context y renderizar 
 template_name = Le dice a Django que use unn nombre de plantilla especifico en vez del nombre de plantilla generado de forma automática
 Esto hace q la vista de resultados y detalle tengan un aspecto diferente cuando sean creadas, a pesar de que ambas tengan una vista generica DetailView en 2do plano   '''
 
-class IndexView(generic.ListView):# muestra una lista de objetos
+class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
     def get_queryset(self):
-        """Return the last five published questions."""
-        return Question.objects.order_by("-pub_date")[:5]
+        """ Devuelve las últimas 5 preguntas publicadas, excluyendo preguntas con fecha futura. """
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by("-pub_date")[:5]
 
 """  Vista de detalle de una pregunta concreta, ahora tenemos varias preguntas: 
                 - /polls/
