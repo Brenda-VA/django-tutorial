@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 from django.utils import timezone
+from django.contrib import admin
 
 """ estas clases de python se convertiran e tablas sql:
 y cada vez que cambie o actualice models.py debo ejecutar: 
@@ -20,6 +21,16 @@ class Question(models.Model):
         return self.question_text
     
 # despues de arreglar el error probamos con python manage.py test polls para pobar de nuevo el test manualmente    
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+    
+    #decora metodos de modelo admin
+    @admin.display(
+        boolean=True, #muestra el icono visual de sí/no
+        ordering="pub_date", #permite ordenar usando pub/date
+        description="Published recently?", #cambia el titulo de la columna
+    )
     def was_published_recently(self):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
