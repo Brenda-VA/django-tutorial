@@ -20,11 +20,6 @@ class Question(models.Model):
     def __str__(self):
         return self.question_text
     
-# despues de arreglar el error probamos con python manage.py test polls para pobar de nuevo el test manualmente    
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
-    
     #decora metodos de modelo admin
     @admin.display(
         boolean=True, #muestra el icono visual de sí/no
@@ -49,7 +44,3 @@ class Choice(models.Model):
                             <Question: Question object (1)>      <Question: What's new?>               """
     def __str__(self):
             return self.choice_text
-    
-    
-
-
