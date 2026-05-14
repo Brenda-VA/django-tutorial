@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [# ------- aqui se meten las apps que vayamos a usar, si no lo hacemos django no las incluye
-    'polls.apps.PollsConfig',# METEMOS POLLS, ahora tendrá en cuenta los modelos QUESTION y CHOICE
+    'django_polls.apps.PollsConfig',# METEMOS POLLS, ahora tendrá en cuenta los modelos QUESTION y CHOICE
     'django.contrib.admin',#sitio del admin
     'django.contrib.auth',#sistema de auteticacion
     'django.contrib.contenttypes',#framework que contiene tipos
