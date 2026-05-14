@@ -34,7 +34,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 ]
 
-#Esto significa, solo añade rutas debug cuando DEBUG=True para que producción ≠ desarrollo 
+#Esto significa, solo añade rutas debug cuando DEBUG=True para que produccion 
 if settings.DEBUG:
     urlpatterns += [
         path("__debug__/", include("debug_toolbar.urls")),
